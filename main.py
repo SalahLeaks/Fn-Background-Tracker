@@ -15,6 +15,7 @@ logging.basicConfig(
 
 # Discord webhook URL
 WEBHOOK_URL = "YOUR_WEBHOOK_URL"
+PING_USER_ID =  ",,,,"
 
 # Fortnite API endpoint
 API_URL = "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game/dynamicbackgrounds"
@@ -86,7 +87,7 @@ def save_image_data(image_url):
 def send_discord_webhook(image_url):
     """Send a message with the image URL to the Discord webhook without a plain text link."""
     data = {
-        "content": "",  # Empty content to avoid sending plain text
+        "content": f"<@{PING_USER_ID}>",
         "embeds": [
             {
                 "title": "New Fortnite Dynamic Background",
