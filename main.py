@@ -22,9 +22,6 @@ API_URL = "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/p
 # Path to store the previous image URL
 JSON_FILE_PATH = "image_data.json"
 
-# Discord role ID to ping
-ROLE_ID = "YOUR_ROLE_ID_HERE"
-
 def log_message(message, level="info"):
     """Logs message to file and prints to console."""
     if level == "info":
@@ -45,9 +42,11 @@ def fetch_api_data():
     try:
         log_message("Fetching data from Fortnite API...", "debug")
         response = requests.get(API_URL)
-        response.raise_for_status()
+        response.raise_for_status()  # Raise exception for HTTP errors
 
         data = response.json()
+
+        # Extract the first background image URL
         backgrounds = data.get("backgrounds", {}).get("backgrounds", [])
         if backgrounds:
             image_url = backgrounds[0].get("backgroundimage", None)
@@ -85,15 +84,15 @@ def save_image_data(image_url):
         log_message(f"Error saving image data: {e}", "error")
 
 def send_discord_webhook(image_url):
-    """Send a message with the image URL to the Discord webhook, always pinging the role."""
+    """Send a message with the image URL to the Discord webhook without a plain text link."""
     data = {
-        "content": f"<@&{ROLE_ID}>",
+        "content": "",  # Empty content to avoid sending plain text
         "embeds": [
             {
                 "title": "New Fortnite Dynamic Background",
                 "description": "A new dynamic background has been added!",
-                "image": {"url": image_url},
-                "thumbnail": {"url": image_url}
+                "image": {"url": image_url},  # Main image
+                "thumbnail": {"url": image_url}  # Thumbnail (same as main)
             }
         ]
     }
@@ -101,6 +100,7 @@ def send_discord_webhook(image_url):
     try:
         log_message("Sending webhook to Discord...", "debug")
         response = requests.post(WEBHOOK_URL, json=data)
+
         if response.status_code == 204:
             log_message("Webhook sent successfully!", "info")
         else:
